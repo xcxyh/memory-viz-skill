@@ -68,6 +68,55 @@ python scripts/video_generate.py "dog_run.mp4" "一只小狗在草地上奔跑" 
 
 ---
 
+### 🎙️ Feishu Offline Voice
+
+使用 Microsoft Edge-TTS 本地生成 Telegram 和飞书的语音消息。完全离线工作，零成本。
+
+**功能特性：**
+- 🔒 完全本地化 - 无需云 API 令牌（OpenAI/Google/Azure 免费用）
+- 🎯 零成本 - 使用免费的 Edge-TTS，无限制使用
+- 🗣️ 高质量语音 - 默认使用 zh-CN-XiaoxiaoNeural
+- 📱 多平台支持 - 支持 Telegram OGG 格式 + 飞书音频
+- 🇨🇳 中文优化 - 自动清理中文标点和 Markdown 格式
+- ⚠️ 时长限制 - 最大 60 秒，超长文本需分段或总结
+
+**依赖要求：**
+```bash
+# Edge-TTS
+pip install edge-tts
+
+# FFmpeg（Debian/Ubuntu）
+apt install ffmpeg
+
+# Pydub（用于 OGG 转换）
+pip install pydub
+```
+
+**使用方法：**
+```bash
+# 生成原始音频
+edge-tts --voice zh-CN-XiaoxiaoNeural --rate=+5% --text "你好，这是测试" --write-media raw.mp3
+
+# 转换为 Telegram/飞书 OGG 格式
+python3 -c "
+from pydub import AudioSegment
+audio = AudioSegment.from_mp3('raw.mp3')
+audio.export('voice.ogg', format='ogg', codec='libopus', parameters=['-b:a', '48k', '-ar', '48000'])
+"
+```
+
+**可用语音：**
+```bash
+edge-tts --list-voices | grep zh-CN
+```
+
+**推荐语音：**
+- `zh-CN-XiaoxiaoNeural` — 女性，温暖（默认）
+- `zh-CN-YunxiNeural` — 男性，专业
+- `zh-CN-XiaoyiNeural` — 女性，年轻
+
+---
+
 ## 目录结构
 
 ```
@@ -83,9 +132,11 @@ my-custom-skills/
 ├── image-generate/         # 图片生成技能
 │   ├── SKILL.md            # 技能说明
 │   └── scripts/            # Python 脚本
-└── video-generate/         # 视频生成技能
-    ├── SKILL.md            # 技能说明
-    └── scripts/            # Python 脚本
+├── video-generate/         # 视频生成技能
+│   ├── SKILL.md            # 技能说明
+│   └── scripts/            # Python 脚本
+└── feishu-offline-voice/   # 飞书离线语音技能
+    └── SKILL.md            # 技能说明
 ```
 
 ## 环境要求
@@ -96,7 +147,12 @@ my-custom-skills/
 
 ### 其他技能
 - Python >= 3.8
-- 相关 API Key 配置
+- 相关 API Key 配置（Web Search, Image/Video Generate）
+
+### Feishu Offline Voice
+- Python >= 3.8
+- `pip install edge-tts pydub`
+- FFmpeg（系统依赖）
 
 ## 快速开始
 
@@ -124,11 +180,12 @@ python scripts/image_generate.py "prompt"
 
 ## 配置说明
 
-大多数技能需要配置相应的 API Key：
+大多数技能需要配置相应的 API Key 或依赖：
 
 - **Web Search:** 火山引擎融合信息搜索 API Key
 - **Image Generate:** `MODEL_IMAGE_API_KEY` 或 `ARK_API_KEY`
 - **Video Generate:** `MODEL_VIDEO_API_KEY` 或 `ARK_API_KEY`
+- **Feishu Offline Voice:** Edge-TTS + FFmpeg + pydub（无需 API Key）
 
 ## 许可证
 
